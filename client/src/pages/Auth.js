@@ -1,102 +1,80 @@
+import React, { useState } from "react";
 import axios from "axios";
-import { useState } from "react";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
+function Auth() {
+  const navigate = useNavigate(); // ✅ inside component
 
-// after login success
-localStorage.setItem("userName", res.data.name);
-localStorage.setItem("isAdmin", res.data.isAdmin);
-
-navigate("/");
-
-function Auth({ setUserName, setIsAdmin }) {
   const [isLogin, setIsLogin] = useState(true);
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async () => {
     try {
-      const url = isLogin
-        ? "http://localhost:5000/login"
-        : "http://localhost:5000/signup";
+      if (isLogin) {
+        // LOGIN
+        const res = await axios.post("https://skill-marketplace-n8j5.onrender.com/login", {
+          email,
+          password,
+        });
 
-      const res = await axios.post(url, form);
+        alert("Login Successful");
 
-      if (res.data.message.includes("successful")) {
-        toast.success(res.data.message);
+        localStorage.setItem("userName", res.data.name);
+        localStorage.setItem("isAdmin", res.data.isAdmin);
 
-        if (isLogin) {
-          // 🔥 STORE
-          localStorage.setItem("userName", res.data.name);
-          localStorage.setItem("isAdmin", res.data.isAdmin);
-
-          // 🔥 FORCE UPDATE
-          setUserName(res.data.name);
-          setIsAdmin(res.data.isAdmin === true);
-
-          // 🔥 VERY IMPORTANT (FORCE RELOAD UI)
-          window.location.href = "/";
-        } else {
-          setIsLogin(true);
-        }
+        navigate("/"); // ✅ redirect
       } else {
-        toast.error(res.data.message);
+        // SIGNUP
+        await axios.post("https://your-backend.onrender.com/signup", {
+          name,
+          email,
+          password,
+        });
+
+        alert("Signup Successful");
+        setIsLogin(true);
       }
     } catch (err) {
-      toast.error("Server error ❌");
+      alert("Error: " + err.response?.data || "Something went wrong");
     }
   };
 
   return (
-    <div className="container mt-4">
-      <h2>{isLogin ? "Login" : "Signup"}</h2>
+    <div className="container mt-5">
+      <h2>{isLogin ? "Login" : "Sign Up"}</h2>
 
       {!isLogin && (
         <input
           className="form-control my-2"
           placeholder="Name"
-          onChange={(e) =>
-            setForm({ ...form, name: e.target.value })
-          }
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
       )}
 
       <input
         className="form-control my-2"
         placeholder="Email"
-        onChange={(e) =>
-          setForm({ ...form, email: e.target.value })
-        }
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
 
       <input
-        type="password"
         className="form-control my-2"
         placeholder="Password"
-        onChange={(e) =>
-          setForm({ ...form, password: e.target.value })
-        }
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
 
       <button className="btn btn-primary" onClick={handleSubmit}>
-        {isLogin ? "Login" : "Signup"}
+        {isLogin ? "Login" : "Sign Up"}
       </button>
 
-      <p
-        className="mt-3 text-primary"
-        style={{ cursor: "pointer" }}
-        onClick={() => setIsLogin(!isLogin)}
-      >
-        {isLogin
-          ? "New user? Signup"
-          : "Already have account? Login"}
+      <p className="mt-3" onClick={() => setIsLogin(!isLogin)} style={{ cursor: "pointer" }}>
+        {isLogin ? "New user? Sign up" : "Already have an account? Login"}
       </p>
     </div>
   );
