@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -9,72 +9,84 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  // 🔥 Global user state
-  const [userName, setUserName] = useState(
-    localStorage.getItem("userName")
-  );
+  const [services, setServices] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // 🚪 Logout
+  // 🔥 Load user from localStorage on refresh
+  useEffect(() => {
+    const storedUser = localStorage.getItem("userName");
+    const storedAdmin = localStorage.getItem("isAdmin") === "true";
+
+    if (storedUser) setUserName(storedUser);
+    if (storedAdmin) setIsAdmin(true);
+  }, []);
+
+  // 🔓 Logout
   const handleLogout = () => {
-    localStorage.removeItem("userName");
-    setUserName(null);
+    localStorage.clear();
+    setUserName("");
+    setIsAdmin(false);
   };
 
   return (
     <BrowserRouter>
+      <nav className="navbar navbar-dark bg-dark px-3">
+        <span className="navbar-brand text-white">SkillMarket 🚀</span>
 
-      {/* 🔥 NAVBAR */}
-      <nav className="navbar navbar-dark bg-dark px-4">
-        <span className="navbar-brand fw-bold">SkillMarket 🚀</span>
-
-        <div className="d-flex align-items-center">
-
-          {/* 👋 USER NAME */}
-          {userName && (
-            <span className="text-white me-3">👋 {userName}</span>
-          )}
-
+        <div>
           <Link className="btn btn-light mx-2" to="/">Home</Link>
+          <Link className="btn btn-light mx-2" to="/add">Add Service</Link>
 
-          {/* 🔒 PROTECTED ADD SERVICE */}
-          <Link className="btn btn-light mx-2" to="/add">
-            Add Service
-          </Link>
-
-          {!userName ? (
-            <Link className="btn btn-light mx-2" to="/auth">Login</Link>
+          {userName ? (
+            <>
+              <span className="text-white mx-2">Hi, {userName}</span>
+              <button className="btn btn-danger" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
           ) : (
-            <button className="btn btn-danger mx-2" onClick={handleLogout}>
-              Logout 🚪
-            </button>
+            <Link className="btn btn-light mx-2" to="/auth">Login</Link>
           )}
-
         </div>
       </nav>
 
-      {/* 🔔 TOAST */}
       <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* 🔄 ROUTES */}
       <Routes>
-        <Route path="/" element={<Home />} />
-
-        {/* 🔥 PROTECTED ROUTE */}
         <Route
-          path="/add"
+          path="/"
           element={
-            userName ? (
-              <AddService />
-            ) : (
-              <Auth setUserName={setUserName} />
-            )
+            <Home
+              services={services}
+              setServices={setServices}
+              userName={userName}
+              isAdmin={isAdmin}
+            />
           }
         />
 
-        {/* AUTH */}
-        <Route path="/auth" element={<Auth setUserName={setUserName} />} />
-      </Routes>
+        <Route
+          path="/add"
+          element={
+            <AddService
+              services={services}
+              setServices={setServices}
+              userName={userName}
+            />
+          }
+        />
 
+        <Route
+          path="/auth"
+          element={
+            <Auth
+              setUserName={setUserName}
+              setIsAdmin={setIsAdmin}
+            />
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
