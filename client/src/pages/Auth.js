@@ -3,6 +3,14 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+const navigate = useNavigate();
+
+// after login success
+localStorage.setItem("userName", res.data.name);
+localStorage.setItem("isAdmin", res.data.isAdmin);
+
+navigate("/");
+
 function Auth({ setUserName, setIsAdmin }) {
   const [isLogin, setIsLogin] = useState(true);
 
@@ -12,7 +20,6 @@ function Auth({ setUserName, setIsAdmin }) {
     password: ""
   });
 
-  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     try {
