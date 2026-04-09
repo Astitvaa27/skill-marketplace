@@ -15,11 +15,18 @@ function App() {
 
   // 🔥 Load user from localStorage on refresh
   useEffect(() => {
-    const storedUser = localStorage.getItem("userName");
-    const storedAdmin = localStorage.getItem("isAdmin") === "true";
+    const name = localStorage.getItem("userName");
+    const admin = localStorage.getItem("isAdmin");
 
-    if (storedUser) setUserName(storedUser);
-    if (storedAdmin) setIsAdmin(true);
+    if (name && name !== "undefined") {
+      setUserName(name);
+    } else {
+      localStorage.clear(); // 🔥 clear bad data
+    }
+
+    if (admin === "true") {
+      setIsAdmin(true);
+    }
   }, []);
 
   // 🔓 Logout
