@@ -120,7 +120,7 @@ npm start
 - Payment Integration 💳  
 
 ---<img width="1919" height="859" alt="Screenshot 2026-04-09 152335" src="https://github.com/user-attachments/assets/741c0a17-a72d-4fed-bd52-b29fe5b4ad8e" />
-<img width="1919" height="859" alt="Screenshot 2026-04-09 152335" src="https://github.com/user-attachments/assets/741c0a17-a72d-4fed-bd52-b29fe5b4ad8e" />
+
 
 
 ## 👨‍💻 Author
