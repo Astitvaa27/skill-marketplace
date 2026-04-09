@@ -1,0 +1,54 @@
+body {
+  background-color: #f5f7fa;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Card */
+.card {
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* Image */
+.card img {
+  border-bottom: 1px solid #eee;
+}
+
+/* Buttons */
+.btn-warning {
+  background-color: #facc15;
+  border: none;
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  border: none;
+}
+
+.btn-success {
+  background-color: #22c55e;
+  border: none;
+}
+
+/* Inputs */
+input.form-control {
+  border-radius: 10px;
+  padding: 10px;
+}
+
+/* Heading */
+h2 {
+  font-weight: 600;
+}
