@@ -2,241 +2,169 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-function Home() {
+function Home({ userName, isAdmin }) {
   const [services, setServices] = useState([]);
-
-  const [editIndex, setEditIndex] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editPrice, setEditPrice] = useState("");
-  const [editImage, setEditImage] = useState("");
 
   const [search, setSearch] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  // 🔥 IMPORTANT FIX
-  const userName = localStorage.getItem("userName");
-  const isAdmin = localStorage.getItem("isAdmin") === "true";
+  const [editId, setEditId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editImage, setEditImage] = useState("");
 
-  // DEBUG (you can remove later)
-  console.log("USER:", userName);
-  console.log("ADMIN:", isAdmin);
-
-  // FETCH
+  // FETCH SERVICES
   useEffect(() => {
-    axios.get("https://skill-marketplace-n8j5.onrender.com/services")
-      .then(res => setServices(res.data));
+    axios
+      .get("http://localhost:5000/services")
+      .then((res) => setServices(res.data))
+      .catch(() => toast.error("Error loading"));
   }, []);
 
   // DELETE
-  const handleDelete = (index) => {
-    axios.delete(`https://skill-marketplace-n8j5.onrender.com/services/${index}`)
-      .then(() => {
-        setServices(services.filter((_, i) => i !== index));
-        toast.success("Deleted 🗑️");
-      });
+  const handleDelete = async (id, owner) => {
+    if (userName !== owner && !isAdmin) {
+      toast.error("Not allowed ❌");
+      return;
+    }
+
+    await axios.delete(`http://localhost:5000/services/${id}`);
+
+    setServices(services.filter((s) => s._id !== id));
+    toast.success("Deleted 🗑️");
   };
 
-  // EDIT START
-  const startEdit = (service, index) => {
-    setEditIndex(index);
+  // START EDIT
+  const startEdit = (service) => {
+    if (userName !== service.user && !isAdmin) {
+      toast.error("Not allowed ❌");
+      return;
+    }
+
+    setEditId(service._id);
     setEditTitle(service.title);
     setEditPrice(service.price);
-    setEditImage(service.image || "");
-  };
-
-  // IMAGE EDIT
-  const handleEditImage = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const img = new Image();
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      img.src = event.target.result;
-    };
-
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-
-      const MAX_WIDTH = 300;
-      const MAX_HEIGHT = 200;
-
-      let width = img.width;
-      let height = img.height;
-
-      if (width > MAX_WIDTH) {
-        height = height * (MAX_WIDTH / width);
-        width = MAX_WIDTH;
-      }
-
-      if (height > MAX_HEIGHT) {
-        width = width * (MAX_HEIGHT / height);
-        height = MAX_HEIGHT;
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-
-      const compressedImage = canvas.toDataURL("image/jpeg", 0.7);
-      setEditImage(compressedImage);
-    };
-
-    reader.readAsDataURL(file);
+    setEditImage(service.image);
   };
 
   // UPDATE
-  const handleUpdate = () => {
-    axios.put(`https://skill-marketplace-n8j5.onrender.com/services/${editIndex}`, {
+  const handleUpdate = async () => {
+    await axios.put(`http://localhost:5000/services/${editId}`, {
       title: editTitle,
       price: editPrice,
       image: editImage,
-      user: userName
-    }).then(() => {
-      const updated = [...services];
-      updated[editIndex] = {
-        title: editTitle,
-        price: editPrice,
-        image: editImage,
-        user: userName
-      };
-
-      setServices(updated);
-      setEditIndex(null);
-      toast.success("Updated ✏️");
     });
+
+    const updated = services.map((s) =>
+      s._id === editId
+        ? { ...s, title: editTitle, price: editPrice, image: editImage }
+        : s
+    );
+
+    setServices(updated);
+    setEditId(null);
+    toast.success("Updated ✏️");
   };
+
+  // FILTER
+  const filtered = services.filter((s) => {
+    const matchSearch = s.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchPrice = maxPrice ? Number(s.price) <= maxPrice : true;
+
+    return matchSearch && matchPrice;
+  });
 
   return (
     <div className="container mt-4">
-      <h2>Explore Services 🔥</h2>
+      <h2>🔥 Explore Services</h2>
 
       {/* SEARCH */}
       <input
-        className="form-control my-2"
-        placeholder="Search..."
+        className="form-control my-3"
+        placeholder="Search services..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {/* FILTER */}
+      {/* PRICE FILTER */}
       <input
-        className="form-control my-2"
+        type="number"
+        className="form-control mb-3"
         placeholder="Max Price"
         value={maxPrice}
         onChange={(e) => setMaxPrice(e.target.value)}
       />
 
       <div className="row">
-        {services
-          .filter(s =>
-            s.title.toLowerCase().includes(search.toLowerCase())
-          )
-          .filter(s =>
-            maxPrice === "" || s.price <= Number(maxPrice)
-          )
-          .map((service, index) => (
-            <div className="col-md-4" key={index}>
-              <div
-                className="card mt-4 shadow-lg"
-                style={{
-                  border:
-                    service.user === userName
-                      ? "2px solid green"
-                      : ""
-                }}
-              >
-                <img
-                  src={service.image || "https://picsum.photos/300/200"}
-                  className="card-img-top"
-                  style={{ height: "200px", objectFit: "cover" }}
-                  alt=""
-                />
+        {filtered.map((service) => (
+          <div className="col-md-4" key={service._id}>
+            <div className="card shadow mt-3">
 
-                <div className="card-body">
+              <img
+                src={service.image || "https://via.placeholder.com/300"}
+                className="card-img-top"
+                style={{ height: "200px", objectFit: "cover" }}
+                alt=""
+              />
 
-                  {editIndex === index ? (
-                    <>
-                      <input
-                        className="form-control my-2"
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                      />
+              <div className="card-body">
 
-                      <input
-                        className="form-control my-2"
-                        value={editPrice}
-                        onChange={(e) => setEditPrice(e.target.value)}
-                      />
+                {editId === service._id ? (
+                  <>
+                    <input
+                      className="form-control my-2"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                    />
 
-                      <input
-                        type="file"
-                        className="form-control my-2"
-                        onChange={handleEditImage}
-                      />
+                    <input
+                      className="form-control my-2"
+                      value={editPrice}
+                      onChange={(e) => setEditPrice(e.target.value)}
+                    />
 
-                      {editImage && (
-                        <img
-                          src={editImage}
-                          alt=""
-                          style={{
-                            width: "100%",
-                            height: "150px",
-                            objectFit: "cover"
-                          }}
-                        />
-                      )}
+                    <input
+                      className="form-control my-2"
+                      value={editImage}
+                      onChange={(e) => setEditImage(e.target.value)}
+                    />
 
-                      <button
-                        className="btn btn-success mt-2"
-                        onClick={handleUpdate}
-                      >
-                        Save
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <h5>{service.title}</h5>
-                      <p>₹{service.price}</p>
+                    <button
+                      className="btn btn-success"
+                      onClick={handleUpdate}
+                    >
+                      Save
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h5>{service.title}</h5>
+                    <p className="text-success">₹{service.price}</p>
 
-                      <p className="text-muted">
-                        Seller: {service.user || "Unknown"}
+                    <button
+                      className="btn btn-warning me-2"
+                      onClick={() => startEdit(service)}
+                    >
+                      Edit
+                    </button>
 
-                        {isAdmin && (
-                          <span className="badge bg-danger ms-2">
-                            Admin
-                          </span>
-                        )}
-                      </p>
-
-                      {/* 🔥 FINAL FIX */}
-                      {(service.user === userName || isAdmin) && (
-                        <div className="d-flex justify-content-between">
-                          <button
-                            className="btn btn-warning"
-                            onClick={() => startEdit(service, index)}
-                          >
-                            Edit
-                          </button>
-
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => handleDelete(index)}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                </div>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() =>
+                        handleDelete(service._id, service.user)
+                      }
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
     </div>
   );

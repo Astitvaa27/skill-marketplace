@@ -1,9 +1,16 @@
+const mongoose = require("mongoose");
+const Service = require("./models/Service");
+
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
 
 const app = express();
 const PORT = 5000;
+
+mongoose.connect("mongodb+srv://astitva:Astitva27@cluster0.ye837kp.mongodb.net/skillmarket?retryWrites=true&w=majority")
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log("MongoDB Error",err));
 
 // 🔥 CORS FIX (IMPORTANT)
 app.use(cors());
@@ -64,8 +71,8 @@ app.post("/login", (req, res) => {
   if (user) {
     res.json({
       message: "Login successful ✅",
-      name: user.name,   // 🔥 THIS IS THE KEY
-      isAdmin: user.email === "admin123@gmail.com"
+      name: user.name,                 // 🔥 IMPORTANT
+      isAdmin: user.email === ADMIN_EMAIL  // 🔥 IMPORTANT
     });
   } else {
     res.json({ message: "Invalid credentials ❌" });
@@ -77,47 +84,50 @@ app.post("/login", (req, res) => {
 // 🛠️ SERVICE ROUTES
 // =======================
 
-// GET ALL SERVICES
-app.get("/services", (req, res) => {
-  const data = JSON.parse(fs.readFileSync(serviceFile));
+// ✅ GET ALL SERVICES
+app.get("/services", async (req, res) => {
+  const data = await Service.find();
   res.json(data);
 });
 
-// ADD SERVICE
-app.post("/services", (req, res) => {
-  const data = JSON.parse(fs.readFileSync(serviceFile));
+// ✅ ADD SERVICE
+app.post("/services", async (req, res) => {
+  try {
+    console.log("BODY:", req.body); // 👈 DEBUG
 
-  data.push(req.body);
+    const { title, price, image, user } = req.body;
 
-  fs.writeFileSync(serviceFile, JSON.stringify(data, null, 2));
+    if (!title || !price) {
+      return res.status(400).json({ message: "Missing fields ❌" });
+    }
 
-  res.json({ message: "Service added ✅" });
+    const newService = new Service({
+      title,
+      price,
+      image,
+      user
+    });
+
+    await newService.save();
+
+    res.json({ message: "Service added ✅" });
+
+  } catch (err) {
+    console.log("ERROR:", err); // 👈 IMPORTANT
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// UPDATE SERVICE
-app.put("/services/:index", (req, res) => {
-  const data = JSON.parse(fs.readFileSync(serviceFile));
-
-  const index = req.params.index;
-
-  data[index] = req.body;
-
-  fs.writeFileSync(serviceFile, JSON.stringify(data, null, 2));
-
-  res.json({ message: "Service updated ✏️" });
+// ✅ UPDATE SERVICE
+app.put("/services/:id", async (req, res) => {
+  await Service.findByIdAndUpdate(req.params.id, req.body);
+  res.json({ message: "Updated ✅" });
 });
 
-// DELETE SERVICE
-app.delete("/services/:index", (req, res) => {
-  const data = JSON.parse(fs.readFileSync(serviceFile));
-
-  const index = req.params.index;
-
-  data.splice(index, 1);
-
-  fs.writeFileSync(serviceFile, JSON.stringify(data, null, 2));
-
-  res.json({ message: "Service deleted 🗑️" });
+// ✅ DELETE SERVICE
+app.delete("/services/:id", async (req, res) => {
+  await Service.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deleted ✅" });
 });
 
 
