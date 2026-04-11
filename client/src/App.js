@@ -5,41 +5,28 @@ import Home from "./pages/Home";
 import AddService from "./pages/AddService";
 import Auth from "./pages/Auth";
 
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
 function App() {
-  const [services, setServices] = useState([]);
   const [userName, setUserName] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // 🔥 Load user from localStorage on refresh
   useEffect(() => {
-    const name = localStorage.getItem("userName");
-    const admin = localStorage.getItem("isAdmin");
-
-    if (name && name !== "undefined") {
-      setUserName(name);
-    } else {
-      localStorage.clear(); // 🔥 clear bad data
-    }
-
-    if (admin === "true") {
-      setIsAdmin(true);
-    }
+    setUserName(localStorage.getItem("userName"));
+    setIsAdmin(localStorage.getItem("isAdmin") === "true");
   }, []);
 
-  // 🔓 Logout
   const handleLogout = () => {
     localStorage.clear();
-    setUserName("");
-    setIsAdmin(false);
+    window.location.reload();
   };
 
   return (
     <BrowserRouter>
+
+      {/* ✅ EXACT SAME NAVBAR */}
       <nav className="navbar navbar-dark bg-dark px-3">
-        <span className="navbar-brand text-white">SkillMarket 🚀</span>
+        <Link className="navbar-brand text-white" to="/">
+          SkillMarket 🚀
+        </Link>
 
         <div>
           <Link className="btn btn-light mx-2" to="/">Home</Link>
@@ -47,8 +34,11 @@ function App() {
 
           {userName ? (
             <>
-              <span className="text-white mx-2">Hi, {userName}</span>
-              <button className="btn btn-danger" onClick={handleLogout}>
+              <span className="text-white mx-2">
+                Welcome, {userName}
+              </span>
+
+              <button className="btn btn-danger mx-2" onClick={handleLogout}>
                 Logout
               </button>
             </>
@@ -58,42 +48,13 @@ function App() {
         </div>
       </nav>
 
-      <ToastContainer position="top-right" autoClose={2000} />
-
+      {/* ROUTES */}
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Home
-              services={services}
-              setServices={setServices}
-              userName={userName}
-              isAdmin={isAdmin}
-            />
-          }
-        />
-
-        <Route
-          path="/add"
-          element={
-            <AddService
-              services={services}
-              setServices={setServices}
-              userName={userName}
-            />
-          }
-        />
-
-        <Route
-          path="/auth"
-          element={
-            <Auth
-              setUserName={setUserName}
-              setIsAdmin={setIsAdmin}
-            />
-          }
-        />
+        <Route path="/" element={<Home userName={userName} isAdmin={isAdmin} />} />
+        <Route path="/add" element={<AddService userName={userName} />} />
+        <Route path="/auth" element={<Auth />} />
       </Routes>
+
     </BrowserRouter>
   );
 }
