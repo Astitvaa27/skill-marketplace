@@ -111,4 +111,6 @@ Bootstrap
 ## 🎉 Project Status
 Fully Functional  
 Deployed  
-Resume Ready  
+Resume Ready
+
+© 2026 Astitva Mhatre. All rights reserved.
