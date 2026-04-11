@@ -1,135 +1,114 @@
-# 🚀 Skill Marketplace App
+# 🚀 Skill Marketplace
 
-A full-stack web application where users can create, browse, and manage services — similar to a freelance marketplace like Fiverr.
+A full-stack MERN application that allows users to add, explore, and manage service listings. The platform supports authentication, CRUD operations, and persistent cloud storage.
 
----
-
-## 🌐 Live Demo
-
-Frontend: skill-marketplace-pi.vercel.app
-Backend: [https://your-backend.onrender.com  ](https://skill-marketplace-n8j5.onrender.com)
-
----
+## 🔥 Features
+- User Authentication (Login / Signup)
+- Add Service Listings
+- Delete Services (Owner/Admin only)
+- Search Services by Title
+- Filter Services by Price
+- Admin Privileges for full control
+- Persistent Data using MongoDB Atlas
+- Fully Deployed (Frontend + Backend)
 
 ## 🛠️ Tech Stack
 
-### Frontend
+Frontend:
 - React.js
 - Bootstrap
 - Axios
-- React Router
 
-### Backend
+Backend:
 - Node.js
 - Express.js
-- JSON File Database
 
----
+Database:
+- MongoDB Atlas
 
-## ✨ Features
+Deployment:
+- Vercel (Frontend)
+- Render (Backend)
 
-### 👤 User Features
-- Signup & Login system 🔐
-- Browse all services
-- Search services 🔍
-- Filter by price 💰
-- Add new services
-- Upload service images 🖼️
+## 🌐 Live Links
+- Frontend: https://your-vercel-url.vercel.app  
+- Backend: https://skill-marketplace-n8j5.onrender.com  
 
-### ✏️ Service Management
-- Edit your own services
-- Delete your own services
+## ⚙️ Installation & Setup
 
-### 👑 Admin Features
-- Root admin access (admin123@gmail.com)
-- Can edit ANY service
-- Can delete ANY service
-
----
-
-## 🔐 Authentication
-
-- Simple login/signup system
-- Admin is identified using email:
-  admin123@gmail.com
-
----
-
-## 📁 Project Structure
-
-skill-marketplace/
-│
-├── client/        # React frontend
-│   ├── src/
-│   └── public/
-│
-├── server/        # Node backend
-│   ├── index.js
-│   ├── services.json
-│   └── users.json
-
----
-
-## ⚙️ Installation (Local Setup)
-
-### 1️⃣ Clone the repository
-git clone https://github.com/yourusername/skill-marketplace.git  
+Clone Repository:
+git clone https://github.com/Astitvaa27/skill-marketplace.git  
 cd skill-marketplace  
 
-### 2️⃣ Backend Setup
+Backend Setup:
 cd server  
 npm install  
+
+Create `.env` file in server folder and add:
+MONGO_URI=your_mongodb_connection_string  
+
+Run backend:
 node index.js  
 
-### 3️⃣ Frontend Setup
+Frontend Setup:
 cd client  
 npm install  
 npm start  
 
----
+## 📦 API Endpoints
 
-## 🔗 API Endpoints
+Auth Routes:
+POST /signup → Register user  
+POST /login → Login user  
 
-### Services
-- GET /services  
-- POST /services  
-- PUT /services/:index  
-- DELETE /services/:index  
+Service Routes:
+GET /services → Fetch all services  
+POST /services → Add new service  
+DELETE /services/:id → Delete service  
 
-### Authentication
-- POST /signup  
-- POST /login  
+## 🔐 Environment Variables
+Create `.env` inside `/server`:
+MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/skillDB  
 
----
+## 🧠 Key Concepts Used
+- REST API Development  
+- CRUD Operations  
+- Authentication Logic  
+- React State Management  
+- Axios API Integration  
+- Cloud Database (MongoDB Atlas)  
 
-## ⚠️ Important Notes
+## 🚀 Deployment
 
-- Uses JSON file as database (temporary)
-- Data may reset on server restart (Render free tier)
-- For production, use MongoDB
+Frontend (Vercel):
+- Connected GitHub repo  
+- Auto deploy on push  
 
----
+Backend (Render):
+- Environment variable setup (MONGO_URI)  
+- Manual/auto deploy  
 
-## 🚀 Future Improvements
-
-- JWT Authentication 🔐  
-- MongoDB Database 🍃  
-- Cloudinary Image Upload ☁️  
-- Reviews & Ratings ⭐  
-- Admin Dashboard 📊  
-- Payment Integration 💳  
-
----<img width="1919" height="859" alt="Screenshot 2026-04-09 152335" src="https://github.com/user-attachments/assets/741c0a17-a72d-4fed-bd52-b29fe5b4ad8e" />
-
-
+## ⚠️ Notes
+- Ensure MongoDB Atlas allows access (0.0.0.0/0)  
+- Do not commit `.env` file  
+- Backend must be running for frontend to work  
 
 ## 👨‍💻 Author
+Astitva Mhatre  
 
-Astitva Mhatrer 
-GitHub: https://github.com/Astitvaa27 
+## ⭐ Acknowledgements
+MongoDB Atlas  
+Vercel  
+Render  
+Bootstrap  
 
----
+## 📌 Future Improvements
+- Edit Service Feature  
+- Image Upload (Cloudinary)  
+- Payment Integration  
+- Advanced UI  
 
-## ⭐ Support
-
-If you like this project, give it a ⭐ on GitHub!
+## 🎉 Project Status
+Fully Functional  
+Deployed  
+Resume Ready  
