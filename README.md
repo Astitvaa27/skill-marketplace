@@ -31,7 +31,7 @@ Deployment:
 - Render (Backend)
 
 ## 🌐 Live Links
-- Frontend: https://your-vercel-url.vercel.app  
+- Frontend: https://skill-marketplace-pi.vercel.app  
 - Backend: https://skill-marketplace-n8j5.onrender.com  
 
 ## ⚙️ Installation & Setup
